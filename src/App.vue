@@ -1,13 +1,15 @@
 <template>
   <div id="app">
-    <div id="nav">
+    <!-- <div id="nav">
       <router-link to="/home">Home</router-link> |
       <router-link to="/about">About</router-link> |
       <router-link to="/pano_viewer">全景照片查看器</router-link>
-    </div>
+    </div> -->
     <router-view/>
   </div>
 </template>
+
+<style lang="css" src="./styles/reset.css"></style>
 
 <style lang="less">
 #app {
