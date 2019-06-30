@@ -8,6 +8,11 @@
 
 <script>
 import * as THREE from "three";
+import * as utils from "@/utils/utils";
+
+var util = utils.default;
+console.log(util);
+
 export default {
   name: "PanoWrap",
   data() {
@@ -27,18 +32,15 @@ export default {
       }
     };
   },
-  created: function() {
-    //在vue实例创建之前，获得全景列表
+  created: function() {},
+  mounted: function() {
     var _this = this;
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", "./pano_array.json");
-    xhr.send();
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === 4 && xhr.status === 200) {
-        _this.panosList = JSON.parse(xhr.responseText);
-        console.log(_this.panosList);
-      }
-    };
+    //将事件中的this进行bind
+    _this.eventHandlerBind();
+    //初始化场景
+    _this.sceneInit();
+    //加入鼠标事件
+    _this.attachController("mouse");
   },
   methods: {
     //基本场景初始化
@@ -151,47 +153,6 @@ export default {
       );
     },
 
-    //根据对应的panosList索引来载入对应全景照片。
-    panoLoad: function(index) {
-      var _this = this;
-
-      this.panoImgTex = new THREE.TextureLoader().load(
-        this.panoBasePath + this.panosList[index].imgName,
-        function(e) {
-          _this.panoImgTex.anisotropy = 8;
-
-          e.image.src = _this.panoBasePath + _this.panosList[index].imgName;
-          if (index == _this.currentIndex) {
-            return;
-          } else {
-            _this.currentIndex = index;
-            _this.panoImgTex.dispose();
-
-            _this.panoPhotoMaterial.map = e;
-
-            // _this.panoImgTex.needsUpdate = true;
-
-            for (let i = 0; i < _this.spriteGroup.length; i++) {
-              _this.spriteGroup[i].dispose(); //在切换之前把当前全景上所有的sprite poi清空
-            }
-            _this.spriteGroup.children = []; //在切换之前把当前全景上所有的sprite poi清空
-
-            // for (let i = 0; i < _this.poiObjArr.length; i++) {
-            //     _this.poiObjArr[i].dispose();
-            //     _this.poiObjArr[i].material.dispose();
-            //     _this.poiObjArr[i].material.map.needsUpdate = false;
-            //     _this.poiObjArr[i].material.map.dispose();
-            // }
-
-            //切换之后，读取相关数据，重新将sprite加入场景
-            // _this.panoImgTex.needsUpdate = false;
-
-            // _this.loadMap();
-          }
-        }
-      );
-    },
-
     //与事件相关的各种UI逻辑
     eventHandlerBind: function() {
       this.eventBind = {};
@@ -210,9 +171,7 @@ export default {
     //全景交互
     attachController: function(eventOption) {
       //处理一下某些事件的兼容性问题
-      /*
-                    FireFox中鼠标滚轮事件为DOMMouseScroll
-                    */
+      //FireFox中鼠标滚轮事件为DOMMouseScroll
 
       switch (eventOption) {
         //陀螺仪和鼠标之间暂时没想到并存的办法。
@@ -310,13 +269,13 @@ export default {
       }
     },
     /*
-                交互方式：
-                改变全景照片的方向
-                鼠标/触摸：在屏幕上上下滑动改变上下旋转角，左右滑动更改平面旋转角；
-                设备朝向：移动设备改变摄像机目标的位置
-                改变摄像机的FOV
-                鼠标滚轮：向前放大，向后缩小
-                */
+      交互方式：
+      改变全景照片的方向
+      鼠标/触摸：在屏幕上上下滑动改变上下旋转角，左右滑动更改平面旋转角；
+      设备朝向：移动设备改变摄像机目标的位置
+      改变摄像机的FOV
+      鼠标滚轮：向前放大，向后缩小
+    */
     //处理鼠标或者触摸屏事件
     pointHandler: function(e) {
       //鼠标拖动全景球事件由鼠标左键来触发

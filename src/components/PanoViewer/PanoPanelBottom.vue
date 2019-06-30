@@ -1,16 +1,15 @@
 
 <template>
-  <div class="panoPanelBottom" v-cloak :class="{'fold':ui.panoPanelBottomFold}">
+  <div class="panoPanelBottom" v-cloak :class="{'fold':$parent.ui.panoPanelBottomFold}">
     <button v-on:click="panoListRollToggle" class="rollOutBtn holaGreen">展开收起</button>
     <div class="panoList" data-role="panoList">
       <ul>
-        <li>
-          <!-- <li v-for="(pano,index) in panosList"> -->
+        <li v-for="(pano,index) in panosList">
           <img
             class="panoThumb"
             lazyload="on"
             @click="panoLoad(index)"
-            :src="panoThumbPath+pano.imgThumb"
+            :src="$parent.panoThumbPath+pano.imgThumb"
           />
           <p class="panoTitle">{{pano.desc}}</p>
         </li>
@@ -100,6 +99,9 @@
 
 
 <script>
+import axios from "axios";
+import * as THREE from "three";
+
 export default {
   name: "PanoPanelBottom",
   data() {
@@ -115,7 +117,74 @@ export default {
       currentIndex: 0
     };
   },
+  created() {
+    //在vue实例创建之前，获得全景列表
+    var _this = this;
+    axios
+      .get("./pano_array.json")
+      .then(res => {
+        console.log(res);
+        _this.panosList = res.data;
+      })
+      .catch(err => {
+        console.log(err);
+      });
+    // var xhr = new XMLHttpRequest();
+    // xhr.open("GET", "./pano_array.json");
+    // xhr.send();
+    // xhr.onreadystatechange = function() {
+    //   if (xhr.readyState === 4 && xhr.status === 200) {
+    //     _this.panosList = JSON.parse(xhr.responseText);
+    //     console.log(_this.panosList);
+    //   }
+    // };
+  },
+  mounted() {
+    var _this=this;
+    //为页面中各个按钮增加事件
+    _this.btnTodoHandler();
+  },
   methods: {
+    //根据对应的panosList索引来载入对应全景照片。
+    panoLoad: function(index) {
+      var _this = this;
+
+      this.panoImgTex = new THREE.TextureLoader().load(
+        this.panoBasePath + this.panosList[index].imgName,
+        function(e) {
+          _this.panoImgTex.anisotropy = 8;
+
+          e.image.src = _this.panoBasePath + _this.panosList[index].imgName;
+          if (index == _this.currentIndex) {
+            return;
+          } else {
+            _this.currentIndex = index;
+            _this.panoImgTex.dispose();
+
+            _this.panoPhotoMaterial.map = e;
+
+            // _this.panoImgTex.needsUpdate = true;
+
+            for (let i = 0; i < _this.spriteGroup.length; i++) {
+              _this.spriteGroup[i].dispose(); //在切换之前把当前全景上所有的sprite poi清空
+            }
+            _this.spriteGroup.children = []; //在切换之前把当前全景上所有的sprite poi清空
+
+            // for (let i = 0; i < _this.poiObjArr.length; i++) {
+            //     _this.poiObjArr[i].dispose();
+            //     _this.poiObjArr[i].material.dispose();
+            //     _this.poiObjArr[i].material.map.needsUpdate = false;
+            //     _this.poiObjArr[i].material.map.dispose();
+            // }
+
+            //切换之后，读取相关数据，重新将sprite加入场景
+            // _this.panoImgTex.needsUpdate = false;
+
+            // _this.loadMap();
+          }
+        }
+      );
+    },
     panoListTodo: function() {
       //全景列表处理
       var panoListDOM = document.querySelector('[data-role="panoList"]>ul');
@@ -187,7 +256,7 @@ export default {
           false
         );
       });
-    },
+    }
   }
 };
 </script>
