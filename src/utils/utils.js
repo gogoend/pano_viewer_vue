@@ -1,5 +1,5 @@
 //范围内随机数产生器
-export const utils = {
+const util = {
     //字符串乱序（类似php同名函数）
     strShuffle: function(str){
         var strArray=str.split('');//拆分字符串到数组
@@ -320,4 +320,5 @@ export const utils = {
 
     }
 }
+export default util;
 // export {util};
