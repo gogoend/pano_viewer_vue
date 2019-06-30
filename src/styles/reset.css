@@ -1,0 +1,64 @@
+html,
+body,
+#app {
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    min-height: 100vh;
+}
+
+body {
+    font-family: sans-serif;
+    line-height: 1em;
+    font-size: 0.16rem;
+}
+
+button {
+    font-size: 0.16rem;
+    font-family: sans-serif;
+}
+
+div {
+    box-sizing: border-box;
+}
+
+ul,
+li {
+    list-style: none;
+    margin: 0;
+    padding: 0
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    line-height: 1em
+}
+
+p {
+    margin: 0;
+}
+
+[v-cloak] {
+    display: none
+}
+
+a,
+a:link,
+a:visited,
+a:hover,
+a:active {
+    text-decoration: none;
+    color: #000
+}
+
+button{
+    cursor: pointer;
+    user-select: none;
+}

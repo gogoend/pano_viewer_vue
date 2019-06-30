@@ -1,0 +1,16 @@
+.buttonLike {
+    cursor: pointer;
+    user-select: none;
+}
+
+#app {
+    position: relative;
+}
+
+button.holaGreen,
+.buttonLike.holaGreen {
+    background: #1c1c1c;
+    /* border: #62d128 solid 2px; */
+    border: 0;
+    color: #62d128;
+}
