@@ -2,6 +2,7 @@
   <div>
     <logo />
     <pano-wrap />
+    <pano-panel-bottom />
   </div>
 </template>
 
@@ -9,13 +10,15 @@
 // @ is an alias to /src
 import store from "vuex";
 import Logo from "@/components/PanoViewer/Logo.vue";
+import PanoPanelBottom from "@/components/PanoViewer/PanoPanelBottom.vue";
 import PanoWrap from "@/components/PanoViewer/PanoWrap.vue";
 
 export default {
   name: "home",
   components: {
     Logo,
-    PanoWrap
+    PanoWrap,
+    PanoPanelBottom
   },
   data() {
     return {
