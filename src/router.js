@@ -7,7 +7,7 @@ Vue.use(Router);
 export default new Router({
   routes: [
     {
-      path: '/',
+      path: '/home',
       name: 'home',
       component: Home,
     },
@@ -20,7 +20,7 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
     },
     {
-      path: '/pano_viewer',
+      path: '/',
       name: 'pano_viewer',
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
