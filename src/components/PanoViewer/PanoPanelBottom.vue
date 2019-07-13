@@ -101,6 +101,8 @@
 <script>
 import axios from "axios";
 import * as THREE from "three";
+import store from "@/store"
+window.THREE=THREE;
 
 export default {
   name: "PanoPanelBottom",
@@ -125,6 +127,8 @@ export default {
       .then(res => {
         console.log(res);
         _this.panosList = res.data;
+        _this.$emit('pano-list-loaded',res.data)
+        // store.commit('panosList',res.data)
       })
       .catch(err => {
         console.log(err);
@@ -199,13 +203,13 @@ export default {
       //     panoListDOM.style.marginLeft = -val.value + "px";
       //   }
       // );
-      window.addEventListener(
-        "resize",
-        function(e) {
-          a.max = panoListDOM.scrollWidth - window.innerWidth;
-        },
-        false
-      );
+      // window.addEventListener(
+      //   "resize",
+      //   function(e) {
+      //     a.max = panoListDOM.scrollWidth - window.innerWidth;
+      //   },
+      //   false
+      // );
     },
     //DOM控件交互
     //伸展下方栏

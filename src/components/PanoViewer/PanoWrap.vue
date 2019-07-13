@@ -15,6 +15,9 @@ console.log(util);
 
 export default {
   name: "PanoWrap",
+  props:{
+    currentPano:Object
+  },
   data() {
     return {
       //检测是否存在用户交互
@@ -41,6 +44,8 @@ export default {
     _this.sceneInit();
     //加入鼠标事件
     _this.attachController("mouse");
+
+    // _this.panoInit(0)
   },
   methods: {
     //基本场景初始化
@@ -152,7 +157,33 @@ export default {
         false
       );
     },
+    panoLoad: function(index) {
+      var _this = this;
+      console.log(this.panoList)
+      this.panoImgTex = new THREE.TextureLoader().load(
+        this.panoBasePath + this.panosList[index].imgName,
+        function(e) {
+          _this.panoImgTex.anisotropy = 8;
 
+          e.image.src = _this.panoBasePath + _this.panosList[index].imgName;
+          if (index == _this.currentIndex) {
+            return;
+          } else {
+            _this.currentIndex = index;
+            _this.panoImgTex.dispose();
+
+            _this.panoPhotoMaterial.map = e;
+
+            // _this.panoImgTex.needsUpdate = true;
+
+            for (let i = 0; i < _this.spriteGroup.length; i++) {
+              _this.spriteGroup[i].dispose(); //在切换之前把当前全景上所有的sprite poi清空
+            }
+            _this.spriteGroup.children = []; //在切换之前把当前全景上所有的sprite poi清空
+          }
+        }
+      );
+    },
     //与事件相关的各种UI逻辑
     eventHandlerBind: function() {
       this.eventBind = {};

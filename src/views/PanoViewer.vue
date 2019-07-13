@@ -1,14 +1,13 @@
 <template>
   <div>
     <logo />
-    <pano-wrap />
-    <pano-panel-bottom />
+    <pano-wrap :current-pano="{}"/>
+    <pano-panel-bottom @pano-list-loaded="handlePanoListLoaded"/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import store from "vuex";
 import Logo from "@/components/PanoViewer/Logo.vue";
 import PanoPanelBottom from "@/components/PanoViewer/PanoPanelBottom.vue";
 import PanoWrap from "@/components/PanoViewer/PanoWrap.vue";
@@ -30,7 +29,8 @@ export default {
       },
       //配置全景图文件夹基地址
       panoBasePath: "./pano_images/",
-      panoThumbPath: "./pano_thumb/"
+      panoThumbPath: "./pano_thumb/",
+      panosList:[]
     };
   },
   created() {},
@@ -43,6 +43,10 @@ export default {
       // console.log(this.renderer)
       //注意this指向，在定时器中this指向window
       requestAnimationFrame(this.animateHandler.bind(this));
+    },
+    //处理全景照片加载
+    handlePanoListLoaded:function(res){
+      this.panosList=res
     }
   }
 };
