@@ -51,23 +51,23 @@ let originUIFunc = {
         this.pointData.originPhi = this.targetSphereCood.phi;
         //
 
-        this.panoWrap.addEventListener(
+        this.panoEl.addEventListener(
           "mousemove",
           bindUIFunc.pointHandler,
           false
         );
-        this.panoWrap.addEventListener(
+        this.panoEl.addEventListener(
           "mouseup",
           bindUIFunc.pointHandler,
           false
         );
 
-        this.panoWrap.addEventListener(
+        this.panoEl.addEventListener(
           "touchmove",
           bindUIFunc.pointHandler,
           false
         );
-        this.panoWrap.addEventListener(
+        this.panoEl.addEventListener(
           "touchend",
           bindUIFunc.pointHandler,
           false
@@ -110,23 +110,23 @@ let originUIFunc = {
         this.renderer.domElement.style.cursor = "grab";
         this.userInteract = false;
 
-        this.panoWrap.removeEventListener(
+        this.panoEl.removeEventListener(
           "mouseup",
           bindUIFunc.pointHandler,
           false
         );
-        this.panoWrap.removeEventListener(
+        this.panoEl.removeEventListener(
           "touchend",
           bindUIFunc.pointHandler,
           false
         );
 
-        this.panoWrap.removeEventListener(
+        this.panoEl.removeEventListener(
           "mousemove",
           bindUIFunc.pointHandler,
           false
         );
-        this.panoWrap.removeEventListener(
+        this.panoEl.removeEventListener(
           "touchmove",
           bindUIFunc.pointHandler,
           false
@@ -253,7 +253,7 @@ const attachController = function (panoWrapComp, eventOption) {
   }
   //处理一下某些事件的兼容性问题
   //FireFox中鼠标滚轮事件为DOMMouseScroll
-  var panoWrapEl = panoWrapComp.panoWrap;
+  var panoWrapEl = panoWrapComp.panoEl;
   switch (eventOption) {
     //陀螺仪和鼠标之间暂时没想到并存的办法。
     //正常方案：在陀螺仪开启的情况下，可能使用触摸来更改cameraTarget的方向

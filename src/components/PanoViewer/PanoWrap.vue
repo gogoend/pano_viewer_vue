@@ -102,8 +102,8 @@ export default {
       renderer.setPixelRatio(window.devicePixelRatio);
 
       //将渲染器 - Canvas元素插入到DOM中
-      var panoWrap = document.getElementById("app").querySelector(".panoWrap");
-      panoWrap.appendChild(renderer.domElement);
+      var panoEl = document.getElementById("app").querySelector(".panoWrap");
+      panoEl.appendChild(renderer.domElement);
 
       //摄像机目标
       var cameraTarget = new THREE.Object3D();
@@ -127,7 +127,7 @@ export default {
       this.defaultCamera = defaultCamera;
       this.cameraGroup = cameraGroup;
       this.renderer = renderer;
-      this.panoWrap = panoWrap;
+      this.panoEl = panoEl;
       this.light = light;
       this.cameraTarget = cameraTarget;
       this.targetSphereCood = targetSphereCood;
@@ -167,7 +167,7 @@ export default {
       // this.animateHandler();
 
       //阻止默认的鼠标右键菜单弹出
-      this.panoWrap.addEventListener(
+      this.panoEl.addEventListener(
         "contextmenu",
         function(e) {
           e.preventDefault();
