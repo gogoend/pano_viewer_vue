@@ -1,5 +1,5 @@
 <template>
-  <div class="panoWrap">
+  <div ref="panoWrap" class="panoWrap">
     <div class="panoControls onscreen">
       <button data-role="btn" data-todo="exitVR" class="holaGreen" v-if="$parent.ui.VRStatus">退出VR</button>
     </div>
@@ -9,14 +9,15 @@
 <script>
 import * as THREE from "three";
 import * as utils from "@/utils/utils";
+import { attachController } from "@/api/controllerToDo.js";
 
 var util = utils.default;
 console.log(util);
 
 export default {
   name: "PanoWrap",
-  props:{
-    currentPano:Object
+  props: {
+    currentPano: Object
   },
   data() {
     return {
@@ -32,7 +33,10 @@ export default {
         offsetY: 0,
         originTheta: 0,
         originPhi: 0
-      }
+      },
+      //配置全景图文件夹基地址
+      panoBasePath: "./pano_images/",
+      panoThumbPath: "./pano_thumb/"
     };
   },
   created: function() {},
@@ -43,9 +47,17 @@ export default {
     //初始化场景
     _this.sceneInit();
     //加入鼠标事件
-    _this.attachController("mouse");
+    console.log(attachController);
+    attachController(_this,"mouse");
 
-    // _this.panoInit(0)
+    _this.panoInit();
+  },
+  watch: {
+    currentPano(val) {
+      console.log(val);
+      this.panoLoad();
+      // return val;
+    }
   },
   methods: {
     //基本场景初始化
@@ -63,6 +75,14 @@ export default {
         0.1,
         1000
       );
+
+      var defaultCamera = new THREE.PerspectiveCamera(
+        80,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+
       defaultCamera.name = "defaultCamera";
 
       var cameraGroup = new THREE.Group();
@@ -117,7 +137,7 @@ export default {
       console.log(this.targetSphereCood);
     },
     //全景球初始化
-    panoInit: function(panoIndex) {
+    panoInit: function() {
       //全景球半径为10
       var panoGeometry = new THREE.SphereBufferGeometry(
         this.panoSphereRadius,
@@ -127,12 +147,10 @@ export default {
       //直接将x设为-1，使得所有面朝向内测
       panoGeometry.scale(-1, 1, 1);
 
-      //载入贴图
-      this.panoLoad(panoIndex);
-
       var panoPhotoMaterial = new THREE.MeshStandardMaterial({
-        map: this.panoImgTex,
+        // map: this.panoImgTex,
         color: 0xffffff
+        // wireframe:true
       });
       var panoSphere = new THREE.Mesh(panoGeometry, panoPhotoMaterial);
       this.scene.add(panoSphere);
@@ -146,7 +164,8 @@ export default {
 
       this.renderer.render(this.scene, this.camera);
 
-      this.animateHandler();
+      this.panoRotationAnimate();
+      // this.animateHandler();
 
       //阻止默认的鼠标右键菜单弹出
       this.panoWrap.addEventListener(
@@ -157,32 +176,35 @@ export default {
         false
       );
     },
-    panoLoad: function(index) {
+    panoLoad: function() {
       var _this = this;
-      console.log(this.panoList)
+      // console.log(this.panoList)
       this.panoImgTex = new THREE.TextureLoader().load(
-        this.panoBasePath + this.panosList[index].imgName,
+        this.panoBasePath + this.currentPano.imgName,
         function(e) {
           _this.panoImgTex.anisotropy = 8;
 
-          e.image.src = _this.panoBasePath + _this.panosList[index].imgName;
-          if (index == _this.currentIndex) {
-            return;
-          } else {
-            _this.currentIndex = index;
-            _this.panoImgTex.dispose();
+          e.image.src = _this.panoBasePath + _this.currentPano.imgName;
+          // if (index == _this.currentIndex) {
+          //   return;
+          // }
+          //  else {
+          // _this.currentIndex = index;
+          _this.panoImgTex.dispose();
+          _this.panoPhotoMaterial.map = e;
+          _this.panoPhotoMaterial.needsUpdate = true;
 
-            _this.panoPhotoMaterial.map = e;
+          console.log(e);
+          // _this.panoImgTex.needsUpdate = true;
 
-            // _this.panoImgTex.needsUpdate = true;
-
-            for (let i = 0; i < _this.spriteGroup.length; i++) {
-              _this.spriteGroup[i].dispose(); //在切换之前把当前全景上所有的sprite poi清空
-            }
-            _this.spriteGroup.children = []; //在切换之前把当前全景上所有的sprite poi清空
-          }
+          // for (let i = 0; i < _this.spriteGroup.length; i++) {
+          //   _this.spriteGroup[i].dispose(); //在切换之前把当前全景上所有的sprite poi清空
+          // }
+          // _this.spriteGroup.children = []; //在切换之前把当前全景上所有的sprite poi清空
+          // }
         }
       );
+      // console.log(this.panoImgTex)
     },
     //与事件相关的各种UI逻辑
     eventHandlerBind: function() {
@@ -199,87 +221,10 @@ export default {
       this.eventBind.pointRayHandler = this.pointRayHandler.bind(this);
       this.eventBind.mouseScrollHandler = this.mouseScrollHandler.bind(this);
     },
-    //全景交互
-    attachController: function(eventOption) {
-      //处理一下某些事件的兼容性问题
-      //FireFox中鼠标滚轮事件为DOMMouseScroll
-
-      switch (eventOption) {
-        //陀螺仪和鼠标之间暂时没想到并存的办法。
-        //正常方案：在陀螺仪开启的情况下，可能使用触摸来更改cameraTarget的方向
-        case "mouse":
-        case "touch": {
-          this.pauseRotete = false;
-          window.removeEventListener(
-            "deviceorientation",
-            this.eventBind.deviceOrientationHandler,
-            false
-          );
-          window.removeEventListener(
-            "orientationchange",
-            this.eventBind.orientationChangeHandler,
-            false
-          );
-          this.panoWrap.addEventListener(
-            "mousedown",
-            this.eventBind.pointHandler,
-            false
-          );
-          this.panoWrap.addEventListener(
-            "touchstart",
-            this.eventBind.pointHandler,
-            false
-          );
-          this.panoWrap.addEventListener(
-            "mousedown",
-            this.eventBind.pointRayHandler,
-            false
-          );
-          this.panoWrap.addEventListener(
-            "mousewheel",
-            this.eventBind.mouseScrollHandler,
-            false
-          );
-          break;
-        }
-        case "orient": {
-          this.panoWrap.removeEventListener(
-            "mousedown",
-            this.eventBind.pointHandler,
-            false
-          );
-          this.panoWrap.removeEventListener(
-            "touchstart",
-            this.eventBind.pointHandler,
-            false
-          );
-          this.panoWrap.removeEventListener(
-            "mousedown",
-            this.eventBind.pointRayHandler,
-            false
-          );
-          this.panoWrap.removeEventListener(
-            "mousewheel",
-            this.eventBind.mouseScrollHandler,
-            false
-          );
-          window.addEventListener(
-            "deviceorientation",
-            this.eventBind.deviceOrientationHandler,
-            false
-          );
-          window.addEventListener(
-            "orientationchange",
-            this.eventBind.orientationChangeHandler,
-            false
-          );
-          break;
-        }
-      }
-    },
     //动画处理
     //全景球旋转动画    //setInterval(animate,100);
     panoRotationAnimate: function() {
+      console.log(1);
       //交互部分
       //判断是否存在用户交互
       //无交互、且无暂停
@@ -298,6 +243,10 @@ export default {
           }
         }
       }
+      this.renderer.render(this.scene, this.camera);
+      // console.log(this.renderer)
+      //注意this指向，在定时器中this指向window
+      requestAnimationFrame(this.panoRotationAnimate.bind(this));
     },
     /*
       交互方式：

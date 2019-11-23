@@ -1,17 +1,18 @@
 
 <template>
   <div class="panoPanelBottom" v-cloak :class="{'fold':$parent.ui.panoPanelBottomFold}">
-    <button v-on:click="panoListRollToggle" class="rollOutBtn holaGreen">展开收起</button>
+    <button @click="panoListRollToggle" class="rollOutBtn holaGreen">展开收起</button>
     <div class="panoList" data-role="panoList">
-      <ul>
-        <li v-for="(pano,index) in panosList">
+      <ul @click="changeCurrentPano">
+        <li v-for="(pano,index) in panosList" :key="index" :data-pano-index="index">
           <img
             class="panoThumb"
             lazyload="on"
             @click="panoLoad(index)"
             :src="$parent.panoThumbPath+pano.imgThumb"
+            style="pointer-events:none"
           />
-          <p class="panoTitle">{{pano.desc}}</p>
+          <p class="panoTitle" style="pointer-events:none">{{pano.desc}}</p>
         </li>
       </ul>
       <!-- 滚动条 -->
@@ -126,22 +127,14 @@ export default {
       .get("./pano_array.json")
       .then(res => {
         console.log(res);
-        _this.panosList = res.data;
+        _this.panosList = res.data.list;
+        _this.currentIndex=res.data.index;
         _this.$emit('pano-list-loaded',res.data)
         // store.commit('panosList',res.data)
       })
       .catch(err => {
         console.log(err);
       });
-    // var xhr = new XMLHttpRequest();
-    // xhr.open("GET", "./pano_array.json");
-    // xhr.send();
-    // xhr.onreadystatechange = function() {
-    //   if (xhr.readyState === 4 && xhr.status === 200) {
-    //     _this.panosList = JSON.parse(xhr.responseText);
-    //     console.log(_this.panosList);
-    //   }
-    // };
   },
   mounted() {
     var _this=this;
@@ -149,6 +142,10 @@ export default {
     _this.btnTodoHandler();
   },
   methods: {
+    changeCurrentPano:function(e){
+      this.$emit('current-pano-change',e.target.dataset.panoIndex)
+    },
+
     //根据对应的panosList索引来载入对应全景照片。
     panoLoad: function(index) {
       var _this = this;
