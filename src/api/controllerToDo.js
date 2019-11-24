@@ -51,23 +51,23 @@ let originUIFunc = {
 
         this.panoEl.addEventListener(
           "mousemove",
-          bindUIFunc.pointHandler,
+          bindUIFunc[this.panoWrapID].pointHandler,
           false
         );
         this.panoEl.addEventListener(
           "mouseup",
-          bindUIFunc.pointHandler,
+          bindUIFunc[this.panoWrapID].pointHandler,
           false
         );
 
         this.panoEl.addEventListener(
           "touchmove",
-          bindUIFunc.pointHandler,
+          bindUIFunc[this.panoWrapID].pointHandler,
           false
         );
         this.panoEl.addEventListener(
           "touchend",
-          bindUIFunc.pointHandler,
+          bindUIFunc[this.panoWrapID].pointHandler,
           false
         );
 
@@ -110,23 +110,23 @@ let originUIFunc = {
 
         this.panoEl.removeEventListener(
           "mouseup",
-          bindUIFunc.pointHandler,
+          bindUIFunc[this.panoWrapID].pointHandler,
           false
         );
         this.panoEl.removeEventListener(
           "touchend",
-          bindUIFunc.pointHandler,
+          bindUIFunc[this.panoWrapID].pointHandler,
           false
         );
 
         this.panoEl.removeEventListener(
           "mousemove",
-          bindUIFunc.pointHandler,
+          bindUIFunc[this.panoWrapID].pointHandler,
           false
         );
         this.panoEl.removeEventListener(
           "touchmove",
-          bindUIFunc.pointHandler,
+          bindUIFunc[this.panoWrapID].pointHandler,
           false
         );
 
@@ -248,10 +248,12 @@ let bindUIFunc={};
 
 // 全景交互
 const attachController = function (panoWrapComp, eventOption) {
-  console.log(panoWrapComp)
-  if(Object.keys(bindUIFunc).length===0){
+  var panoWrapID=panoWrapComp.panoWrapID
+  if(!bindUIFunc[panoWrapID])
+    bindUIFunc[panoWrapID]={}
+  if( Object.keys(bindUIFunc[panoWrapID]).length===0){
     for (let key in originUIFunc) {
-      bindUIFunc[key] = originUIFunc[key].bind(panoWrapComp)
+      bindUIFunc[panoWrapID][key] = originUIFunc[key].bind(panoWrapComp)
     }
   }
   //处理一下某些事件的兼容性问题
@@ -265,32 +267,32 @@ const attachController = function (panoWrapComp, eventOption) {
       panoWrapComp.pauseRotete = false;
       window.removeEventListener(
         "deviceorientation",
-        bindUIFunc.deviceOrientationHandler,
+        bindUIFunc[panoWrapID].deviceOrientationHandler,
         false
       );
       window.removeEventListener(
         "orientationchange",
-        bindUIFunc.orientationChangeHandler,
+        bindUIFunc[panoWrapID].orientationChangeHandler,
         false
       );
       panoWrapEl.addEventListener(
         "mousedown",
-        bindUIFunc.pointHandler,
+        bindUIFunc[panoWrapID].pointHandler,
         false
       );
       panoWrapEl.addEventListener(
         "touchstart",
-        bindUIFunc.pointHandler,
+        bindUIFunc[panoWrapID].pointHandler,
         false
       );
       panoWrapEl.addEventListener(
         "mousedown",
-        bindUIFunc.pointRayHandler,
+        bindUIFunc[panoWrapID].pointRayHandler,
         false
       );
       panoWrapEl.addEventListener(
         "mousewheel",
-        bindUIFunc.mouseScrollHandler,
+        bindUIFunc[panoWrapID].mouseScrollHandler,
         false
       );
       break;
@@ -298,32 +300,32 @@ const attachController = function (panoWrapComp, eventOption) {
     case "orient": {
       panoWrapEl.removeEventListener(
         "mousedown",
-        bindUIFunc.pointHandler,
+        bindUIFunc[panoWrapID].pointHandler,
         false
       );
       panoWrapEl.removeEventListener(
         "touchstart",
-        bindUIFunc.pointHandler,
+        bindUIFunc[panoWrapID].pointHandler,
         false
       );
       panoWrapEl.removeEventListener(
         "mousedown",
-        bindUIFunc.pointRayHandler,
+        bindUIFunc[panoWrapID].pointRayHandler,
         false
       );
       panoWrapEl.removeEventListener(
         "mousewheel",
-        bindUIFunc.mouseScrollHandler,
+        bindUIFunc[panoWrapID].mouseScrollHandler,
         false
       );
       window.addEventListener(
         "deviceorientation",
-        bindUIFunc.deviceOrientationHandler,
+        bindUIFunc[panoWrapID].deviceOrientationHandler,
         false
       );
       window.addEventListener(
         "orientationchange",
-        bindUIFunc.orientationChangeHandler,
+        bindUIFunc[panoWrapID].orientationChangeHandler,
         false
       );
       break;

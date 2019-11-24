@@ -9,6 +9,7 @@
 <script>
 import * as THREE from "three";
 import * as utils from "@/utils/utils";
+import UUID from "uuid-js";
 import { attachController } from "@/api/controllerToDo.js";
 
 var util = utils.default;
@@ -34,21 +35,23 @@ export default {
         originTheta: 0,
         originPhi: 0
       },
+      panoWrapID:null,
       //配置全景图文件夹基地址
       panoBasePath: "./pano_images/",
       panoThumbPath: "./pano_thumb/"
     };
   },
-  created: function() {},
+  created: function() {
+    this.panoWrapID = UUID.create().toString();
+  },
   mounted: function() {
     var _this = this;
-    _this.$store.panoWrapComp=_this;
+    _this.$store.panoWrapComp = _this;
 
     //初始化场景
     _this.sceneInit();
     //加入鼠标事件
-    console.log(attachController);
-    attachController(_this,"mouse");
+    attachController(_this, "mouse");
 
     _this.panoInit();
   },
