@@ -328,52 +328,8 @@ export default {
           _this.camera = _this.defaultCamera;
         }
       });
-    },
-
-    //全景截图，相当于Canvas截取图片
-    shot: function(canvas) {
-      //如果没有传入canvas元素或者传入的不是canvas元素，就默认将canvas参数设为获得的第一个canvas元素
-      if (!(canvas instanceof HTMLCanvasElement)) {
-        if (document.getElementsByTagName("canvas").length !== 0) {
-          canvas = document.getElementsByTagName("canvas")[0];
-        } else {
-          return;
-        }
-      }
-
-      //现渲染现截图，若不渲染就截图，会导致截到全黑画面
-      this.renderer.render(this.scene, this.camera);
-      // console.log(this.renderer.domElement.toDataURL('image/jpeg', 0.92));
-      // window.open();
-
-      var date = new Date();
-      var filenameTime =
-        "panoshot_" +
-        date.getFullYear() +
-        (date.getMonth() + 1) +
-        date.getDate() +
-        date.getHours() +
-        date.getMinutes() +
-        date.getSeconds();
-      var imglink = document.createElement("a");
-      imglink.download = filenameTime;
-      imglink.setAttribute(
-        "href",
-        this.renderer.domElement.toDataURL("image/jpeg", 0.7)
-      );
-      console.log(imglink);
-      var event = new MouseEvent("click");
-      imglink.dispatchEvent(event);
-      // imglink.click()
-
-      // canvas.toBlob(
-      //     function (blob) {
-      //         console.log(blob)
-      //     },
-      //     'image/jpeg',
-      //     0.92
-      // );
     }
+
   }
 };
 </script>

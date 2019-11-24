@@ -1,6 +1,6 @@
 
 <template>
-  <div class="panoPanelBottom" v-cloak :class="{'fold':$parent.ui.panoPanelBottomFold}">
+  <div class="panoPanelBottom" v-cloak :class="{'fold':ui.panoPanelBottomFold}">
     <button @click="panoListRollToggle" class="rollOutBtn holaGreen">展开收起</button>
     <div class="panoList" data-role="panoList">
       <ul @click="changeCurrentPano">
@@ -102,9 +102,9 @@
 <script>
 import axios from "axios";
 import * as THREE from "three";
-import store from "@/store"
+import store from "@/store";
 import { attachController } from "@/api/controllerToDo.js";
-window.THREE=THREE;
+window.THREE = THREE;
 
 export default {
   name: "PanoPanelBottom",
@@ -118,7 +118,10 @@ export default {
 
       // neighborList: positions,
       //当前全景图索引，未来试图通过Ajax来获得首次载入时的索引
-      currentIndex: 0
+      currentIndex: 0,
+      ui: {
+        panoPanelBottomFold: false
+      }
     };
   },
   created() {
@@ -129,8 +132,8 @@ export default {
       .then(res => {
         console.log(res);
         _this.panosList = res.data.list;
-        _this.currentIndex=res.data.index;
-        _this.$emit('pano-list-loaded',res.data)
+        _this.currentIndex = res.data.index;
+        _this.$emit("pano-list-loaded", res.data);
         // store.commit('panosList',res.data)
       })
       .catch(err => {
@@ -138,13 +141,13 @@ export default {
       });
   },
   mounted() {
-    var _this=this;
+    var _this = this;
     //为页面中各个按钮增加事件
     _this.btnTodoHandler();
   },
   methods: {
-    changeCurrentPano:function(e){
-      this.$emit('current-pano-change',e.target.dataset.panoIndex)
+    changeCurrentPano: function(e) {
+      this.$emit("current-pano-change", e.target.dataset.panoIndex);
     },
 
     //根据对应的panosList索引来载入对应全景照片。
@@ -212,14 +215,12 @@ export default {
     //DOM控件交互
     //伸展下方栏
     panoListRollToggle: function() {
-      !this.ui.panoPanelBottomFold
-        ? (this.ui.panoPanelBottomFold = true)
-        : (this.ui.panoPanelBottomFold = false);
+      this.ui.panoPanelBottomFold = !this.ui.panoPanelBottomFold;
     },
     //画面控制按钮
     btnTodoHandler: function() {
       var _this = this;
-      var panoWrapComp=this.$store.panoWrapComp
+      var panoWrapComp = this.$store.panoWrapComp;
       var controlerGroups = document.querySelectorAll(".panoControls");
       controlerGroups.forEach(group => {
         group.addEventListener(
@@ -239,19 +240,19 @@ export default {
                 break;
               }
               case "toggleOrient": {
-                attachController(panoWrapComp,"orient");
+                attachController(panoWrapComp, "orient");
                 break;
               }
               case "togglePointer": {
-                attachController(panoWrapComp,"mouse");
+                attachController(panoWrapComp, "mouse");
                 break;
               }
               case "shot": {
-                _this.shot(
-                  document
+                // let shot = _this.shot.bind(_this.$store.panoWrapComp);
+
+                _this.shot(document
                     .querySelector(".panoWrap")
-                    .getElementsByTagName("canvas")[0]
-                );
+                    .getElementsByTagName("canvas")[0]);
                 break;
               }
             }
@@ -259,6 +260,50 @@ export default {
           false
         );
       });
+    },
+    //全景截图，相当于Canvas截取图片
+    shot: function(canvas) {
+      //如果没有传入canvas元素或者传入的不是canvas元素，就默认将canvas参数设为获得的第一个canvas元素
+      if (!(canvas instanceof HTMLCanvasElement)) {
+        if (document.getElementsByTagName("canvas").length !== 0) {
+          canvas = document.getElementsByTagName("canvas")[0];
+        } else {
+          return;
+        }
+      }
+
+      //现渲染现截图，若不渲染就截图，会导致截到全黑画面
+      this.$store.panoWrapComp.renderer.render(this.$store.panoWrapComp.scene, this.$store.panoWrapComp.camera);
+      // console.log(this.renderer.domElement.toDataURL('image/jpeg', 0.92));
+      // window.open();
+
+      var date = new Date();
+      var filenameTime =
+        "panoshot_" +
+        date.getFullYear() +
+        (date.getMonth() + 1) +
+        date.getDate() +
+        date.getHours() +
+        date.getMinutes() +
+        date.getSeconds();
+      var imglink = document.createElement("a");
+      imglink.download = filenameTime;
+      imglink.setAttribute(
+        "href",
+        this.$store.panoWrapComp.renderer.domElement.toDataURL("image/jpeg", 0.7)
+      );
+      console.log(imglink);
+      var event = new MouseEvent("click");
+      imglink.dispatchEvent(event);
+      // imglink.click()
+
+      // canvas.toBlob(
+      //     function (blob) {
+      //         console.log(blob)
+      //     },
+      //     'image/jpeg',
+      //     0.92
+      // );
     }
   }
 };
