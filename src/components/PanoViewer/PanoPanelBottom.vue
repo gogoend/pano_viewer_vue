@@ -103,6 +103,7 @@
 import axios from "axios";
 import * as THREE from "three";
 import store from "@/store"
+import { attachController } from "@/api/controllerToDo.js";
 window.THREE=THREE;
 
 export default {
@@ -218,6 +219,7 @@ export default {
     //画面控制按钮
     btnTodoHandler: function() {
       var _this = this;
+      var panoWrapComp=this.$store.panoWrapComp
       var controlerGroups = document.querySelectorAll(".panoControls");
       controlerGroups.forEach(group => {
         group.addEventListener(
@@ -237,11 +239,11 @@ export default {
                 break;
               }
               case "toggleOrient": {
-                _this.attachController("orient");
+                attachController(panoWrapComp,"orient");
                 break;
               }
               case "togglePointer": {
-                _this.attachController("mouse");
+                attachController(panoWrapComp,"mouse");
                 break;
               }
               case "shot": {
@@ -261,5 +263,3 @@ export default {
   }
 };
 </script>
-
-        

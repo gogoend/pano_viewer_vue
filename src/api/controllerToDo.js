@@ -14,8 +14,6 @@ import * as utils from "@/utils/utils";
 
 let util=utils.default;
 
-let bindUIFunc={};
-
 let originUIFunc = {
   pointHandler: function (e) {
     //鼠标拖动全景球事件由鼠标左键来触发
@@ -246,10 +244,15 @@ let originUIFunc = {
   }
 }
 
+let bindUIFunc={};
+
 // 全景交互
 const attachController = function (panoWrapComp, eventOption) {
-  for (let key in originUIFunc) {
-    bindUIFunc[key] = originUIFunc[key].bind(panoWrapComp)
+  console.log(panoWrapComp)
+  if(Object.keys(bindUIFunc).length===0){
+    for (let key in originUIFunc) {
+      bindUIFunc[key] = originUIFunc[key].bind(panoWrapComp)
+    }
   }
   //处理一下某些事件的兼容性问题
   //FireFox中鼠标滚轮事件为DOMMouseScroll

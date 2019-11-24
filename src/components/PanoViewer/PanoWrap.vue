@@ -42,6 +42,7 @@ export default {
   created: function() {},
   mounted: function() {
     var _this = this;
+    _this.$store.panoWrapComp=_this;
 
     //初始化场景
     _this.sceneInit();
@@ -214,7 +215,6 @@ export default {
     //动画处理
     //全景球旋转动画    //setInterval(animate,100);
     panoRotationAnimate: function() {
-      console.log(1);
       //交互部分
       //判断是否存在用户交互
       //无交互、且无暂停
