@@ -34,8 +34,7 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/essential",
-      "@vue/airbnb"
+      "plugin:vue/essential"
     ],
     "rules": {},
     "parserOptions": {
