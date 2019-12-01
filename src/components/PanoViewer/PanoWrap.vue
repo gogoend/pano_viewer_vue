@@ -1,7 +1,7 @@
 <template>
   <div ref="panoWrap" class="panoWrap">
     <div class="panoControls onscreen">
-      <button data-role="btn" data-todo="exitVR" class="holaGreen" v-if="$parent.ui.VRStatus">退出VR</button>
+      <!-- <button data-role="btn" data-todo="exitVR" class="holaGreen" v-if="$parent.ui.VRStatus">退出VR</button> -->
     </div>
   </div>
 </template>
@@ -257,78 +257,6 @@ export default {
       this.spriteGroup = spriteGroup;
     },
 
-    //切换到VR
-    enterVR: function() {
-      this.ui.VRStatus = true;
-
-      var element = document.querySelector(".panoWrap");
-      if (document.fullscreenElement) {
-        fullScreen("exit");
-        fullScreen(element, true);
-      } else {
-        fullScreen(element, true);
-      }
-      // element.addEventListener('fullscreenchange', function (e) {
-      //     console.log(e);
-      //     fullScreen('exit');
-      // });
-      this.attachController("orient");
-
-      if (!this.hmdGlasses) {
-        //设置左眼右眼
-        var rightCamera = new THREE.PerspectiveCamera(
-          90,
-          window.innerWidth / window.innerHeight / 2,
-          0.1,
-          1000
-        );
-        rightCamera.name = "rightCamera";
-        var leftCamera = new THREE.PerspectiveCamera(
-          90,
-          window.innerWidth / window.innerHeight / 2,
-          0.1,
-          1000
-        );
-        leftCamera.name = "leftCamera";
-
-        //设置相机的边界
-        leftCamera.bounds = new THREE.Vector4(0, 0, 0.5, 1);
-        rightCamera.bounds = new THREE.Vector4(0.5, 0, 0.5, 1);
-
-        //瞳距
-        leftCamera.position.x = -0.2;
-        rightCamera.position.x = 0.2;
-
-        // leftCamera.lookAt(this.cameraTarget);
-        // rightCamera.lookAt(this.cameraTarget);
-
-        var hmdGlasses = new THREE.ArrayCamera([leftCamera, rightCamera]);
-
-        hmdGlasses.name = "hmdGlasses";
-
-        // hmdGlasses.lookAt(this.cameraTarget);
-
-        hmdGlasses.add(leftCamera);
-        hmdGlasses.add(rightCamera);
-        this.cameraGroup.add(hmdGlasses);
-
-        this.hmdGlasses = hmdGlasses;
-      }
-
-      this.camera = this.hmdGlasses;
-    },
-
-    //退出VR
-    exitVR: function() {
-      var _this = this;
-      fullScreen("exit", false, function() {
-        if (document.fullscreenElement === null) {
-          _this.ui.VRStatus = false;
-          _this.attachController("mouse");
-          _this.camera = _this.defaultCamera;
-        }
-      });
-    }
 
   }
 };

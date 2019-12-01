@@ -20,7 +20,8 @@
 
     <div class="panoControls bottom">
       <button data-role="btn" data-todo="shot" class="holaGreen">截屏</button>
-      <button data-role="btn" data-todo="enterVR" class="holaGreen">VR</button>
+      <!-- <button data-role="btn" data-todo="enterVR" class="holaGreen">+VR</button>
+      <button data-role="btn" data-todo="exitVR" class="holaGreen">-VR</button> -->
       <button data-role="btn" data-todo="toggleFullScreen" class="holaGreen">全屏</button>
       <button data-role="btn" data-todo="toggleOrient" class="holaGreen">陀螺仪</button>
       <button data-role="btn" data-todo="togglePointer" class="holaGreen">鼠标</button>
@@ -104,7 +105,9 @@ import axios from "axios";
 import * as THREE from "three";
 import store from "@/store";
 import { attachController } from "@/api/controllerToDo.js";
+import * as utils from "@/utils/utils";
 window.THREE = THREE;
+let fullScreen=utils.default.fullScreen;
 
 export default {
   name: "PanoPanelBottom",
@@ -304,6 +307,79 @@ export default {
       //     'image/jpeg',
       //     0.92
       // );
+    },
+
+    //切换到VR
+    enterVR: function() {
+      this.ui.VRStatus = true;
+
+      var element = document.querySelector(".panoWrap");
+      if (document.fullscreenElement) {
+        fullScreen("exit");
+        fullScreen(element, true);
+      } else {
+        fullScreen(element, true);
+      }
+      // element.addEventListener('fullscreenchange', function (e) {
+      //     console.log(e);
+      //     fullScreen('exit');
+      // });
+      attachController("orient");
+
+      if (!this.$store.panoWrapComp.hmdGlasses) {
+        //设置左眼右眼
+        var rightCamera = new THREE.PerspectiveCamera(
+          90,
+          window.innerWidth / window.innerHeight / 2,
+          0.1,
+          1000
+        );
+        rightCamera.name = "rightCamera";
+        var leftCamera = new THREE.PerspectiveCamera(
+          90,
+          window.innerWidth / window.innerHeight / 2,
+          0.1,
+          1000
+        );
+        leftCamera.name = "leftCamera";
+
+        //设置相机的边界
+        leftCamera.bounds = new THREE.Vector4(0, 0, 0.5, 1);
+        rightCamera.bounds = new THREE.Vector4(0.5, 0, 0.5, 1);
+
+        //瞳距
+        leftCamera.position.x = -0.2;
+        rightCamera.position.x = 0.2;
+
+        // leftCamera.lookAt(this.cameraTarget);
+        // rightCamera.lookAt(this.cameraTarget);
+
+        var hmdGlasses = new THREE.ArrayCamera([leftCamera, rightCamera]);
+
+        hmdGlasses.name = "hmdGlasses";
+
+        // hmdGlasses.lookAt(this.cameraTarget);
+
+        hmdGlasses.add(leftCamera);
+        hmdGlasses.add(rightCamera);
+        this.$store.panoWrapComp.cameraGroup.add(hmdGlasses);
+
+        this.$store.panoWrapComp.hmdGlasses = hmdGlasses;
+      }
+
+      this.$store.panoWrapComp.camera = hmdGlasses;
+    },
+
+    //退出VR
+    exitVR: function() {
+      var _this = this.$store.panoWrapComp;
+      fullScreen("exit", false, function() {
+        if (document.fullscreenElement === null) {
+          this.ui.VRStatus = false;
+          attachController("mouse");
+          _this.camera = _this.defaultCamera;
+        }
+      });
     }
   }
 };
