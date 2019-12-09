@@ -1,5 +1,6 @@
 <template>
   <div class="logo">
+    <!-- test -->
     <img src="/static/logo.svg" />
   </div>
 </template>
